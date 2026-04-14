@@ -238,7 +238,6 @@
   /* ── INNER SCREENS ── */
   .inner-screen {
     padding: 100px 0 80px;
-    min-height: 100vh;
   }
   .inner-content {
     max-width: 860px;
@@ -301,6 +300,9 @@
     opacity: 0;
     transform: translateY(16px);
     transition: opacity 0.5s, transform 0.5s;
+  }
+  .moment-block:last-child {
+    border-bottom: none;
   }
   .moment-block.revealed { opacity: 1; transform: translateY(0); }
   .moment-label {
@@ -682,12 +684,6 @@
 <!-- NAV -->
 <nav>
   <div class="nav-logo">UNOPS · <span>AI CoE</span> · Discussion Paper</div>
-  <div class="nav-links" id="navLinks" style="display:none">
-    <button class="nav-btn" onclick="goTo('moment')">Urgency</button>
-    <button class="nav-btn" onclick="goTo('success')">Outcomes</button>
-    <button class="nav-btn" onclick="goTo('role')">Complexity</button>
-    <button class="nav-btn" onclick="goTo('internal')">Prerequisites</button>
-  </div>
   <button class="nav-back" id="navBack" style="display:none" onclick="goHome()">
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -773,19 +769,19 @@
             AI initiatives are already forming across business units and field operations, some coordinated, many not. The CoE has a narrow window to establish itself as the natural home for these conversations before the landscape calcifies. <strong>Waiting compounds the problem.</strong> Every month without a functioning CoE is a month in which AI adoption happens around it rather than through it.
           </div>
         </div>
-        <div class="moment-block" id="mb2">
+        <div class="moment-block revealed" id="mb2">
           <div class="moment-label">The real gap</div>
           <div class="moment-text">
             The gap in UNOPS today is not the absence of AI products. It is the absence of <strong>last-mile capability</strong>: the organizational muscle to take something built and get it genuinely adopted. A tool that sits unused is not an asset. It is a liability that erodes confidence in the next initiative.
           </div>
         </div>
-        <div class="moment-block" id="mb3">
+        <div class="moment-block revealed" id="mb3">
           <div class="moment-label">What this means</div>
           <div class="moment-text">
             Success for the CoE is not measured in use cases collected or tools catalogued. It is measured in <span class="highlight">adoption depth</span>, whether AI products are genuinely changing how people work, at scale, across a decentralized global organization. That is a harder problem than building the tools. It requires different skills, and deliberate focus.
           </div>
         </div>
-        <div class="moment-block" id="mb4">
+        <div class="moment-block revealed" id="mb4">
           <div class="moment-label">The pace question</div>
           <div class="moment-text">
             Speed is a legitimate concern. But speed without landing is just noise. The CoE's job is not to slow things down. It is to ensure that what gets built <strong>actually sticks.</strong> Capability building and solution delivery are not sequential. Done well, they reinforce each other: people learn AI by using real tools on real problems, not in advance of them.
@@ -793,12 +789,6 @@
         </div>
       </div>
 
-      <button class="reveal-btn" id="revealBtn" onclick="revealNext()">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path d="M7 2v10M2 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Continue reading
-      </button>
     </div>
   </div>
 </div>
@@ -1110,7 +1100,6 @@
     updateNav();
     updateDots();
 
-    if (id === 'moment') initMoment();
   }
 
   function goHome() {
@@ -1119,17 +1108,7 @@
 
   function updateNav() {
     const isHome = current === 'home';
-    document.getElementById('navLinks').style.display = isHome ? 'none' : 'flex';
     document.getElementById('navBack').style.display = isHome ? 'none' : 'flex';
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.classList.remove('active-nav');
-    });
-    const map = { moment: 0, success: 1, role: 2, internal: 3 };
-    if (!isHome) {
-      const btns = document.querySelectorAll('.nav-btn');
-      if (btns[map[current]]) btns[map[current]].classList.add('active-nav');
-    }
   }
 
   function updateDots() {
@@ -1138,27 +1117,6 @@
     dots.forEach((d, i) => d.classList.toggle('active', i === idx));
   }
 
-  // Moment reveal
-  function initMoment() {
-    revealStep = 1;
-    const blocks = ['mb2','mb3','mb4'];
-    blocks.forEach(id => {
-      document.getElementById(id).classList.remove('revealed');
-    });
-    document.getElementById('revealBtn').disabled = false;
-    document.getElementById('revealBtn').style.display = 'inline-flex';
-  }
-
-  function revealNext() {
-    const blocks = ['mb2','mb3','mb4'];
-    if (revealStep <= blocks.length) {
-      document.getElementById(blocks[revealStep - 1]).classList.add('revealed');
-      revealStep++;
-      if (revealStep > blocks.length) {
-        document.getElementById('revealBtn').style.display = 'none';
-      }
-    }
-  }
 
   // Directive tabs
   function showDirective(name) {
