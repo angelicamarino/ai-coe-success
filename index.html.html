@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dressed for Success - UNOPS AI CoE</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F4EF;
+    --warm-white: #FDFBF8;
+    --ink: #1A1814;
+    --ink-light: #3D3A35;
+    --ink-muted: #7A766E;
+    --teal: #1A6B6B;
+    --teal-light: #2A8F8F;
+    --teal-pale: #E8F4F4;
+    --teal-mid: #4AAFAF;
+    --gold: #C4922A;
+    --gold-pale: #FBF4E8;
+    --border: #E2DDD5;
+    --border-strong: #C8C2B8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.55s cubic-bezier(0.4,0,0.2,1), transform 0.55s cubic-bezier(0.4,0,0.2,1);
+    transform: translateY(18px);
+    overflow-y: auto;
+  }
+  .screen.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+  .screen.exit {
+    opacity: 0;
+    transform: translateY(-18px);
+    pointer-events: none;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(247,244,239,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .nav-logo span { color: var(--teal); }
+  .nav-links {
+    display: flex;
+    gap: 6px;
+  }
+  .nav-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 7px 16px;
+    border-radius: 100px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--ink); background: var(--border); }
+  .nav-btn.active-nav {
+    background: var(--ink-light);
+    color: var(--cream);
+    border-color: var(--ink-light);
+  }
+  .nav-back {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 0;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .nav-back:hover { color: var(--teal); }
+  .nav-back svg { transition: transform 0.2s; }
+  .nav-back:hover svg { transform: translateX(-3px); }
+
+  /* ── HOME SCREEN ── */
+  #home {
+    background: var(--warm-white);
+    justify-content: center;
+    align-items: center;
+    padding: 100px 48px 60px;
+    min-height: 100vh;
+  }
+  .home-inner {
+    max-width: 900px;
+    width: 100%;
+  }
+  .home-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .home-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--teal);
+  }
+  .home-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 700;
+    line-height: 1.08;
+    color: var(--ink);
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+  .home-headline em {
+    font-style: italic;
+    color: var(--teal);
+  }
+  .home-sub {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink-light);
+    line-height: 1.65;
+    max-width: 580px;
+    margin-bottom: 64px;
+  }
+  .home-sub strong { font-weight: 500; color: var(--ink); }
+
+  .branch-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .branch-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+  .branch-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--teal);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .branch-card:hover {
+    border-color: var(--teal);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(26,107,107,0.1);
+    background: var(--warm-white);
+  }
+  .branch-card:hover::before { transform: scaleX(1); }
+  .branch-card:hover .card-arrow { transform: translate(3px, -3px); opacity: 1; }
+
+  .card-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-mid);
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .card-desc {
+    font-size: 13.5px;
+    color: var(--ink-muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .card-arrow {
+    position: absolute;
+    top: 28px; right: 28px;
+    opacity: 0.3;
+    transition: all 0.25s;
+    color: var(--teal);
+  }
+
+  /* ── INNER SCREENS ── */
+  .inner-screen {
+    padding: 100px 0 80px;
+    min-height: 100vh;
+  }
+  .inner-content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--teal);
+  }
+  .section-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+  .section-headline em { font-style: italic; color: var(--teal); }
+  .section-lead {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink-light);
+    line-height: 1.7;
+    max-width: 620px;
+    margin-bottom: 56px;
+    border-left: 2px solid var(--teal);
+    padding-left: 24px;
+  }
+  .section-lead strong { font-weight: 500; color: var(--ink); }
+
+  /* ── SCREEN 1: STRATEGIC MOMENT ── */
+  .moment-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .moment-block {
+    padding: 36px 0;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 40px;
+    align-items: start;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s, transform 0.5s;
+  }
+  .moment-block.revealed { opacity: 1; transform: translateY(0); }
+  .moment-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    padding-top: 4px;
+  }
+  .moment-text {
+    font-size: 15px;
+    color: var(--ink-light);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .moment-text strong { font-weight: 500; color: var(--ink); }
+  .moment-text .highlight {
+    display: inline-block;
+    background: var(--teal-pale);
+    color: var(--teal);
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .reveal-btn {
+    margin-top: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--teal);
+    background: var(--teal-pale);
+    border: 1px solid rgba(26,107,107,0.2);
+    border-radius: 100px;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .reveal-btn:hover {
+    background: var(--teal);
+    color: white;
+    border-color: var(--teal);
+  }
+  .reveal-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ── SCREEN 2: SUCCESS FRAMEWORK ── */
+  .directive-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .dir-tab {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 22px;
+    border-radius: 100px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.02em;
+  }
+  .dir-tab:hover { border-color: var(--teal); color: var(--teal); }
+  .dir-tab.active {
+    background: var(--ink-light);
+    color: white;
+    border-color: var(--ink-light);
+  }
+
+  .directive-panel {
+    display: none;
+    animation: fadeSlideIn 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .directive-panel.active { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    background: var(--ink-light);
+    border-radius: 16px 16px 0 0;
+    padding: 36px 40px;
+    color: white;
+  }
+  .panel-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-mid);
+    margin-bottom: 12px;
+  }
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .panel-desc {
+    font-size: 14.5px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.65;
+    font-weight: 300;
+    max-width: 540px;
+  }
+
+  .panel-body {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    padding: 0 40px;
+  }
+  .panel-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .panel-col {
+    padding: 32px 28px;
+    border-right: 1px solid var(--border);
+  }
+  .panel-col:last-child { border-right: none; }
+  .col-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 16px;
+  }
+  .col-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .col-item {
+    font-size: 13.5px;
+    color: var(--ink-light);
+    line-height: 1.5;
+    font-weight: 300;
+    padding-left: 14px;
+    border-left: 2px solid var(--border-strong);
+    transition: border-color 0.2s;
+  }
+  .col-item:hover { border-left-color: var(--teal); color: var(--ink); }
+  .col-item strong { font-weight: 500; display: block; color: var(--ink); margin-bottom: 2px; }
+
+  /* ── SCREEN 3: ROLE DEMANDS ── */
+  .role-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .role-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--warm-white);
+    transition: border-color 0.25s;
+  }
+  .role-item:hover { border-color: var(--teal-mid); }
+  .role-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .role-header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .role-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--teal-mid);
+    min-width: 24px;
+  }
+  .role-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .role-chevron {
+    color: var(--ink-muted);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+  .role-item.open .role-chevron { transform: rotate(180deg); }
+  .role-item.open { border-color: var(--teal); }
+  .role-item.open .role-header { background: var(--teal-pale); }
+  .role-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .role-body-inner {
+    padding: 0 28px 28px 72px;
+  }
+  .role-body p {
+    font-size: 14.5px;
+    color: var(--ink-light);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+  .role-body p strong { font-weight: 500; color: var(--ink); }
+  .role-body .signal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold-pale);
+    border: 1px solid rgba(196,146,42,0.2);
+    color: var(--gold);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-top: 4px;
+  }
+
+  /* ── SCREEN 4: INTERNAL CASE ── */
+  .internal-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .internal-card {
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid var(--border);
+  }
+  .internal-card.risk {
+    background: #FBF7F4;
+    border-color: #E8D5C4;
+  }
+  .internal-card.opportunity {
+    background: var(--teal-pale);
+    border-color: rgba(26,107,107,0.2);
+  }
+  .internal-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .internal-card.risk .internal-card-label { color: #A0522D; }
+  .internal-card.opportunity .internal-card-label { color: var(--teal); }
+  .internal-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .internal-card.risk .internal-card-title { color: var(--ink); }
+  .internal-card.opportunity .internal-card-title { color: var(--teal); }
+  .internal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .internal-list li {
+    font-size: 13.5px;
+    color: var(--ink-light);
+    line-height: 1.55;
+    font-weight: 300;
+    list-style: none;
+    display: flex;
+    gap: 10px;
+  }
+  .internal-list li::before {
+    content: '—';
+    color: var(--ink-muted);
+    flex-shrink: 0;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .verdict-block {
+    background: var(--ink-light);
+    border-radius: 16px;
+    padding: 40px;
+    color: white;
+  }
+  .verdict-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-mid);
+    margin-bottom: 16px;
+  }
+  .verdict-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    line-height: 1.45;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+  .verdict-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.7;
+    font-weight: 300;
+    max-width: 560px;
+  }
+
+  /* ── PROGRESS DOTS ── */
+  .progress-dots {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 200;
+    background: rgba(247,244,239,0.85);
+    backdrop-filter: blur(8px);
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .dot.active { background: var(--teal); width: 20px; border-radius: 3px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+  /* ── UTILITY ── */
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-32 { margin-top: 32px; }
+
+  @media (max-width: 700px) {
+    nav { padding: 16px 24px; }
+    .home-inner, .inner-content { padding: 0 24px; }
+    .branch-grid { grid-template-columns: 1fr; }
+    .panel-row { grid-template-columns: 1fr; }
+    .panel-col { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 0; }
+    .internal-layout { grid-template-columns: 1fr; }
+    .moment-block { grid-template-columns: 1fr; gap: 8px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">UNOPS · <span>AI CoE</span> · Discussion Paper</div>
+  <div class="nav-links" id="navLinks" style="display:none">
+    <button class="nav-btn" onclick="goTo('moment')">Urgency</button>
+    <button class="nav-btn" onclick="goTo('success')">Outcomes</button>
+    <button class="nav-btn" onclick="goTo('role')">Complexity</button>
+    <button class="nav-btn" onclick="goTo('internal')">Prerequisites</button>
+  </div>
+  <button class="nav-back" id="navBack" style="display:none" onclick="goHome()">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    Back to overview
+  </button>
+</nav>
+
+<!-- PROGRESS DOTS -->
+<div class="progress-dots" id="progressDots">
+  <div class="dot active" onclick="goHome()"></div>
+  <div class="dot" onclick="goTo('moment')"></div>
+  <div class="dot" onclick="goTo('success')"></div>
+  <div class="dot" onclick="goTo('role')"></div>
+  <div class="dot" onclick="goTo('internal')"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 0 — HOME
+════════════════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div id="home">
+    <div class="home-inner">
+      <div class="home-eyebrow">April 2026 · UNOPS · Internal Discussion</div>
+      <h1 class="home-headline">Building AI is<br>the <em>easy part.</em></h1>
+      <p class="home-sub">
+        A discussion on what it actually takes for the UNOPS AI CoE to deliver lasting impact.
+      </p>
+      <div class="branch-grid">
+        <div class="branch-card" onclick="goTo('moment')">
+          <div class="card-num">01</div>
+          <div class="card-title">The Urgency</div>
+          <p class="card-desc">Why this window matters, and what happens if the CoE fails to establish itself quickly as the organizational center of gravity for AI.</p>
+          <div class="card-arrow">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 14L14 4M14 4H7M14 4V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="branch-card" onclick="goTo('success')">
+          <div class="card-num">02</div>
+          <div class="card-title">The Outcomes</div>
+          <p class="card-desc">A framework across the three directives: what good looks like, how it gets measured, and what the CoE specifically owns in each area.</p>
+          <div class="card-arrow">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 14L14 4M14 4H7M14 4V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="branch-card" onclick="goTo('role')">
+          <div class="card-num">03</div>
+          <div class="card-title">The Complexity</div>
+          <p class="card-desc">The Coordinator's actual job, broken down into the dimensions that determine whether the CoE moves or stalls. More complex than it first appears.</p>
+          <div class="card-arrow">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 14L14 4M14 4H7M14 4V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="branch-card" onclick="goTo('internal')">
+          <div class="card-num">04</div>
+          <div class="card-title">The Prerequisites</div>
+          <p class="card-desc">The case for appointing from within, not as a preference, but as a strategic prerequisite given the pace the organization needs to move at.</p>
+          <div class="card-arrow">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 14L14 4M14 4H7M14 4V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1 — THE MOMENT
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-moment">
+  <div class="inner-screen">
+    <div class="inner-content">
+      <div class="section-eyebrow">01 · The Strategic Moment</div>
+      <h2 class="section-headline">The risk isn't that UNOPS<br>won't build <em>AI.</em></h2>
+      <p class="section-lead">
+        The risk is that UNOPS will build it and <strong>fail to embed it.</strong> Across the organization, enthusiasm for AI is real and growing. Without a coordination center that earns genuine trust quickly, that enthusiasm fragments into competing initiatives, inconsistent choices, and tools that get launched but never truly land.
+      </p>
+
+      <div class="moment-blocks" id="momentBlocks">
+        <div class="moment-block revealed">
+          <div class="moment-label">The window</div>
+          <div class="moment-text">
+            AI initiatives are already forming across business units and field operations, some coordinated, many not. The CoE has a narrow window to establish itself as the natural home for these conversations before the landscape calcifies. <strong>Waiting compounds the problem.</strong> Every month without a functioning CoE is a month in which AI adoption happens around it rather than through it.
+          </div>
+        </div>
+        <div class="moment-block" id="mb2">
+          <div class="moment-label">The real gap</div>
+          <div class="moment-text">
+            The gap in UNOPS today is not the absence of AI products. It is the absence of <strong>last-mile capability</strong>: the organizational muscle to take something built and get it genuinely adopted. A tool that sits unused is not an asset. It is a liability that erodes confidence in the next initiative.
+          </div>
+        </div>
+        <div class="moment-block" id="mb3">
+          <div class="moment-label">What this means</div>
+          <div class="moment-text">
+            Success for the CoE is not measured in use cases collected or tools catalogued. It is measured in <span class="highlight">adoption depth</span>, whether AI products are genuinely changing how people work, at scale, across a decentralized global organization. That is a harder problem than building the tools. It requires different skills, and deliberate focus.
+          </div>
+        </div>
+        <div class="moment-block" id="mb4">
+          <div class="moment-label">The pace question</div>
+          <div class="moment-text">
+            Speed is a legitimate concern. But speed without landing is just noise. The CoE's job is not to slow things down. It is to ensure that what gets built <strong>actually sticks.</strong> Capability building and solution delivery are not sequential. Done well, they reinforce each other: people learn AI by using real tools on real problems, not in advance of them.
+          </div>
+        </div>
+      </div>
+
+      <button class="reveal-btn" id="revealBtn" onclick="revealNext()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 2v10M2 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Continue reading
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2 — SUCCESS FRAMEWORK
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-success">
+  <div class="inner-screen">
+    <div class="inner-content">
+      <div class="section-eyebrow">02 · What Success Looks Like</div>
+      <h2 class="section-headline">Three directives.<br>One coherent test.</h2>
+      <p class="section-lead">
+        The charter defines three directives. Success across all three can be tested against a single question: <strong>is the CoE the place the organization comes to, or the place it routes around?</strong>
+      </p>
+
+      <div class="directive-tabs">
+        <button class="dir-tab active" onclick="showDirective('capability')">Build Capability</button>
+        <button class="dir-tab" onclick="showDirective('solutions')">Build Solutions</button>
+        <button class="dir-tab" onclick="showDirective('partnerships')">Build Partnerships</button>
+      </div>
+
+      <!-- CAPABILITY -->
+      <div class="directive-panel active" id="panel-capability">
+        <div class="panel-header">
+          <div class="panel-tag">Directive 01 · Capability & Adoption Accelerator</div>
+          <div class="panel-title">Build Capability</div>
+          <div class="panel-desc">Getting the organization genuinely AI-literate, not through abstract training, but through capability built in the context of real tools and real work. Literacy that sticks is always embedded in doing.</div>
+        </div>
+        <div class="panel-body">
+          <div class="panel-row">
+            <div class="panel-col">
+              <div class="col-label">What success looks like</div>
+              <div class="col-items">
+                <div class="col-item"><strong>Proactive engagement</strong>Teams come to the CoE before launching AI initiatives, not after.</div>
+                <div class="col-item"><strong>Embedded literacy</strong>People understand AI well enough to ask better questions of IT and push back when a solution doesn't fit the problem.</div>
+                <div class="col-item"><strong>Field reach</strong>Capability building isn't headquarter-centric. Field offices are engaged and reflected in training design.</div>
+              </div>
+            </div>
+            <div class="panel-col">
+              <div class="col-label">How it gets measured</div>
+              <div class="col-items">
+                <div class="col-item"><strong>Adoption depth</strong>Are tools being used 60 days after launch, not just in week one?</div>
+                <div class="col-item"><strong>Inbound volume</strong>Is the CoE receiving more requests over time, without being mandated?</div>
+                <div class="col-item"><strong>Stakeholder perception</strong>Do business unit leaders describe the CoE as useful, not bureaucratic?</div>
+              </div>
+            </div>
+            <div class="panel-col">
+              <div class="col-label">What the CoE owns</div>
+              <div class="col-items">
+                <div class="col-item"><strong>The narrative</strong>Translating what IT builds into language that moves people to act.</div>
+                <div class="col-item"><strong>Training design</strong>Learning wrapped around real products, not standalone modules.</div>
+                <div class="col-item"><strong>Early adopter strategy</strong>Knowing which teams to activate first and in what sequence.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOLUTIONS -->
+      <div class="directive-panel" id="panel-solutions">
+        <div class="panel-header">
+          <div class="panel-tag">Directive 02 · Solution Incubator</div>
+          <div class="panel-title">Build Solutions</div>
+          <div class="panel-desc">Identifying, prioritizing, and getting the right AI solutions into the hands of people who will actually use them. The hard part is not building. It is choosing what to build and ensuring it lands.</div>
+        </div>
+        <div class="panel-body">
+          <div class="panel-row">
+            <div class="panel-col">
+              <div class="col-label">What success looks like</div>
+              <div class="col-items">
+                <div class="col-item"><strong>Fewer, better choices</strong>A small portfolio of high-impact solutions with clear owners, not a long list of use cases without momentum.</div>
+                <div class="col-item"><strong>Time to launch</strong>Products move from ready to landed without stalling in a gap between IT and the organization.</div>
+                <div class="col-item"><strong>Demonstrable value</strong>At least two or three solutions in year one with documented, measurable business impact.</div>
+              </div>
+            </div>
+            <div class="panel-col">
+              <div class="col-label">How it gets measured</div>
+              <div class="col-items">
+                <div class="col-item"><strong>Launch velocity</strong>Time between product readiness and organizational rollout.</div>
+                <div class="col-item"><strong>Use case quality</strong>Proportion of scoped use cases that reach deployment, not just the pipeline size.</div>
+                <div class="col-item"><strong>Business outcome attribution</strong>Even directional evidence that a solution changed a process or decision.</div>
+              </div>
+            </div>
+            <div class="panel-col">
+              <div class="col-label">What the CoE owns</div>
+              <div class="col-items">
+                <div class="col-item"><strong>Prioritization judgment</strong>Assessing which problems are worth solving with AI and how much investment they warrant.</div>
+                <div class="col-item"><strong>The last mile</strong>Everything between a finished product and genuine organizational adoption.</div>
+                <div class="col-item"><strong>Product feedback loop</strong>Structured insight from users back to IT to improve what has been built.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTNERSHIPS -->
+      <div class="directive-panel" id="panel-partnerships">
+        <div class="panel-header">
+          <div class="panel-tag">Directive 03 · Partnerships & Outreach Hub</div>
+          <div class="panel-title">Build Partnerships</div>
+          <div class="panel-desc">Positioning UNOPS as a credible and trusted actor in the AI space, externally with partners and donors, internally across a decentralized organization that operates with significant regional autonomy.</div>
+        </div>
+        <div class="panel-body">
+          <div class="panel-row">
+            <div class="panel-col">
+              <div class="col-label">What success looks like</div>
+              <div class="col-items">
+                <div class="col-item"><strong>External credibility</strong>Peer organizations and donors view UNOPS as a serious, responsible AI actor, not a follower.</div>
+                <div class="col-item"><strong>Internal alignment</strong>Field offices and regions see the CoE as a resource, not a headquarters imposition.</div>
+                <div class="col-item"><strong>Idea flow</strong>Real-world problems from partners and field operations are informing what the CoE prioritizes, not just internal IT ambition.</div>
+              </div>
+            </div>
+            <div class="panel-col">
+              <div class="col-label">How it gets measured</div>
+              <div class="col-items">
+                <div class="col-item"><strong>Partner engagement</strong>Number of substantive external conversations that generate actionable intelligence for the CoE.</div>
+                <div class="col-item"><strong>Field representation</strong>Whether the portfolio of solutions reflects needs from outside HQ.</div>
+                <div class="col-item"><strong>Inbound interest</strong>External parties seeking UNOPS out for AI collaboration, not the reverse.</div>
+              </div>
+            </div>
+            <div class="panel-col">
+              <div class="col-label">What the CoE owns</div>
+              <div class="col-items">
+                <div class="col-item"><strong>The UNOPS AI narrative</strong>A coherent external story about what UNOPS is doing and why it matters.</div>
+                <div class="col-item"><strong>Field engagement strategy</strong>How the CoE reaches into decentralized operations without feeling top-down.</div>
+                <div class="col-item"><strong>Problem sourcing</strong>Actively translating partner and field needs into the CoE's solution pipeline.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 3 — THE ROLE
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-role">
+  <div class="inner-screen">
+    <div class="inner-content">
+      <div class="section-eyebrow">03 · What the Role Demands</div>
+      <h2 class="section-headline">More sophisticated<br>than it <em>first appears.</em></h2>
+      <p class="section-lead">
+        The Coordinator is the operational engine of the CoE, not a support function. In the early phase, the success of the CoE and the performance of this role are essentially the same thing.
+      </p>
+
+      <div class="role-grid">
+        <div class="role-item" id="role1">
+          <div class="role-header" onclick="toggleRole('role1')">
+            <div class="role-header-left">
+              <span class="role-num">01</span>
+              <span class="role-title">Last-Mile Ownership</span>
+            </div>
+            <svg class="role-chevron" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="role-body">
+            <div class="role-body-inner">
+              <p>The gap between a product being technically ready and an organization genuinely adopting it is wide and almost never filled automatically. <strong>The Coordinator owns this gap entirely.</strong> This means the rollout narrative, the training design, the sequencing of who gets access when, the identification of champions, and the feedback loop back to IT.</p>
+              <p>This is not a communications task. It is a strategic and political challenge that requires knowing the organization well enough to anticipate resistance, identify the right first movers, and build momentum that sustains beyond week one.</p>
+              <div class="signal">⚠ The signal to watch: a product that has been "ready to launch" for weeks without launching is a last-mile failure, not a technical one.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="role-item" id="role2">
+          <div class="role-header" onclick="toggleRole('role2')">
+            <div class="role-header-left">
+              <span class="role-num">02</span>
+              <span class="role-title">Prioritization Judgment</span>
+            </div>
+            <svg class="role-chevron" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="role-body">
+            <div class="role-body-inner">
+              <p>A long list of use cases is not a strategy. The Coordinator must be able to <strong>assess the value of a problem before reaching for a solution</strong>, understanding whether AI is the right tool, how complex a solution needs to be, and how much organizational energy is worth investing.</p>
+              <p>This judgment is rarer than it sounds. It requires enough technical fluency to evaluate feasibility, enough business understanding to assess value, and enough organizational knowledge to anticipate adoption risk. Collecting use cases is easy. Knowing which three to act on first is the skill.</p>
+              <div class="signal">⚠ The signal to watch: a pipeline full of use cases with no clear prioritization rationale and no active deployments.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="role-item" id="role3">
+          <div class="role-header" onclick="toggleRole('role3')">
+            <div class="role-header-left">
+              <span class="role-num">03</span>
+              <span class="role-title">Technical Fluency as a Bridge</span>
+            </div>
+            <svg class="role-chevron" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="role-body">
+            <div class="role-body-inner">
+              <p>The Coordinator does not need to be an engineer. But they need to be able to <strong>sit in a product design conversation and push back intelligently</strong>, to recognize when a proposed solution is more complex than the problem warrants, or when a feature will create friction rather than remove it.</p>
+              <p>They also need to bring ideas forward, to see a problem in the organization and translate it into a product concept that IT can act on. This requires comfort with AI capabilities: understanding what is genuinely easy versus hard to build, what works reliably versus what is still immature, and how to describe a business need in terms a technical team can work with.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="role-item" id="role4">
+          <div class="role-header" onclick="toggleRole('role4')">
+            <div class="role-header-left">
+              <span class="role-num">04</span>
+              <span class="role-title">Organizational Navigation</span>
+            </div>
+            <svg class="role-chevron" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="role-body">
+            <div class="role-body-inner">
+              <p>UNOPS is a decentralized, globally distributed organization. The Coordinator needs to earn trust from people who did not ask for a CoE and make the CoE feel relevant to field operations, not just a headquarters initiative. <strong>This is fundamentally a relationship job</strong>, and relationships take time that an external hire simply does not have.</p>
+              <p>Knowing which business unit leaders are natural champions, which will be skeptical, and how to engage each of them differently is not something that can be learned from an onboarding document. It comes from having worked in the organization, from knowing the politics, the informal networks, and the history of past digital initiatives.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="role-item" id="role5">
+          <div class="role-header" onclick="toggleRole('role5')">
+            <div class="role-header-left">
+              <span class="role-num">05</span>
+              <span class="role-title">Governance Without Friction</span>
+            </div>
+            <svg class="role-chevron" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="role-body">
+            <div class="role-body-inner">
+              <p>The CoE is responsible for governance, but governance done badly is the fastest way to make the CoE irrelevant. <strong>The Coordinator must design processes that feel like guidance, not gatekeeping.</strong> This means lightweight, fast, and clearly useful, so that teams choose to engage rather than route around it.</p>
+              <p>The charter mandates that all organization-wide AI initiatives follow CoE-led governance. Making that real without creating a bottleneck requires significant judgment about when to be firm and when to enable, and the credibility to hold that line with both IT and business stakeholders.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 4 — INTERNAL CASE
+════════════════════════════════════════════ -->
+<div class="screen" id="screen-internal">
+  <div class="inner-screen">
+    <div class="inner-content">
+      <div class="section-eyebrow">04 · Why Internal Is the Only Viable Path</div>
+      <h2 class="section-headline">Organizational knowledge<br>is not a <em>preference.</em></h2>
+      <p class="section-lead">
+        It is the prerequisite. Given the pace the organization needs to move at, the cost of an external hire spending their first six months learning the landscape is a cost UNOPS cannot afford to pay. <strong>Internal appointment is the strategic choice, not the comfortable one.</strong>
+      </p>
+
+      <div class="internal-layout">
+        <div class="internal-card risk">
+          <div class="internal-card-label">The external hire risk</div>
+          <div class="internal-card-title">What gets lost without organizational context</div>
+          <ul class="internal-list">
+            <li>Months spent mapping who to talk to, who holds informal influence, and how decisions actually get made</li>
+            <li>No existing relationships with business unit leaders. Trust must be built from zero while simultaneously delivering</li>
+            <li>No understanding of the existing IT product landscape, past digital initiatives, or why certain approaches have succeeded or failed</li>
+            <li>Governance processes designed without understanding how the organization actually functions, likely to create friction rather than remove it</li>
+            <li>Field and regional dynamics entirely opaque, leading to a headquarters-centric CoE by default</li>
+          </ul>
+        </div>
+        <div class="internal-card opportunity">
+          <div class="internal-card-label">The internal advantage</div>
+          <div class="internal-card-title">What organizational knowledge actually enables</div>
+          <ul class="internal-list">
+            <li>Able to identify the right early adopters and champions from day one, no discovery phase required</li>
+            <li>Existing credibility with stakeholders across functions. The CoE earns trust faster because the Coordinator already has it</li>
+            <li>Understands the IT product landscape and can immediately connect business needs to existing capabilities</li>
+            <li>Knows the informal networks and can navigate resistance before it becomes visible</li>
+            <li>Can design governance that fits how UNOPS actually operates, not how an org chart says it should</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="verdict-block">
+        <div class="verdict-label">The bottom line</div>
+        <div class="verdict-text">"Waiting a year to fill this role is not a neutral decision. It is a choice to let AI adoption continue without coordination, and the cost of that compounds monthly."</div>
+        <div class="verdict-sub">The right internal candidate, someone with the organizational knowledge, the technical fluency to engage credibly with IT, the judgment to prioritize well, and the capability to own the last mile, is more valuable to this role than any external hire with a stronger AI résumé. The combination of skills required here is only found by someone who already knows what they are walking into.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const screens = ['home','moment','success','role','internal'];
+  let current = 'home';
+  let revealStep = 1;
+
+  function goTo(id) {
+    const prev = document.getElementById('screen-' + current);
+    prev.classList.remove('active');
+    prev.classList.add('exit');
+    setTimeout(() => prev.classList.remove('exit'), 600);
+
+    const next = document.getElementById('screen-' + id);
+    next.classList.add('active');
+    next.scrollTop = 0;
+    current = id;
+    updateNav();
+    updateDots();
+
+    if (id === 'moment') initMoment();
+  }
+
+  function goHome() {
+    goTo('home');
+  }
+
+  function updateNav() {
+    const isHome = current === 'home';
+    document.getElementById('navLinks').style.display = isHome ? 'none' : 'flex';
+    document.getElementById('navBack').style.display = isHome ? 'none' : 'flex';
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.remove('active-nav');
+    });
+    const map = { moment: 0, success: 1, role: 2, internal: 3 };
+    if (!isHome) {
+      const btns = document.querySelectorAll('.nav-btn');
+      if (btns[map[current]]) btns[map[current]].classList.add('active-nav');
+    }
+  }
+
+  function updateDots() {
+    const dots = document.querySelectorAll('.dot');
+    const idx = screens.indexOf(current);
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+
+  // Moment reveal
+  function initMoment() {
+    revealStep = 1;
+    const blocks = ['mb2','mb3','mb4'];
+    blocks.forEach(id => {
+      document.getElementById(id).classList.remove('revealed');
+    });
+    document.getElementById('revealBtn').disabled = false;
+    document.getElementById('revealBtn').style.display = 'inline-flex';
+  }
+
+  function revealNext() {
+    const blocks = ['mb2','mb3','mb4'];
+    if (revealStep <= blocks.length) {
+      document.getElementById(blocks[revealStep - 1]).classList.add('revealed');
+      revealStep++;
+      if (revealStep > blocks.length) {
+        document.getElementById('revealBtn').style.display = 'none';
+      }
+    }
+  }
+
+  // Directive tabs
+  function showDirective(name) {
+    document.querySelectorAll('.dir-tab').forEach((t, i) => {
+      const names = ['capability','solutions','partnerships'];
+      t.classList.toggle('active', names[i] === name);
+    });
+    document.querySelectorAll('.directive-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  // Role accordion
+  function toggleRole(id) {
+    const item = document.getElementById(id);
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.role-item').forEach(r => {
+      r.classList.remove('open');
+      r.querySelector('.role-body').style.maxHeight = '0';
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      const body = item.querySelector('.role-body');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') goHome();
+  });
+</script>
+</body>
+</html>
